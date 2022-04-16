@@ -1,0 +1,213 @@
+create DATABASE project;
+
+use project;
+
+--Location Table
+CREATE TABLE locations (
+	loc_ID INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	locLatt VARCHAR(128) NOT NULL,
+	locLong VARCHAR(128) NOT NULL,
+	UNIQUE(locLatt,locLong)
+)ENGINE = InnoDB;
+
+--School Table
+CREATE TABLE schools (
+	school_ID INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	schoolName VARCHAR(30) NOT NULL,
+	schoolPop INT(11) NOT NULL DEFAULT 0,
+	schoolDesc VARCHAR(255),
+	UNIQUE(schoolName)
+)ENGINE = InnoDB;
+
+--School Location Table
+CREATE TABLE schoolLoc (
+	schoolLoc_UID INT(11) NOT NULL,
+	schoolLoc_LID INT(11) NOT NULL,
+	PRIMARY KEY(schoolLoc_UID, schoolLoc_LID),
+	CONSTRAINT schoolLoc_UID_fk
+	FOREIGN KEY(schoolLoc_UID) REFERENCES schools(school_ID) ON DELETE CASCADE,
+	CONSTRAINT schoolLoc_LID_fk
+	FOREIGN KEY(schoolLoc_LID) REFERENCES locations(loc_ID) ON DELETE CASCADE
+)ENGINE = InnoDB;
+
+CREATE TABLE users (
+    users_ID INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+    fullName VARCHAR(128) NOT NULL,
+    userName VARCHAR(128) NOT NULL,
+    email VARCHAR(128) NOT NULL,
+    uPassword VARCHAR(128) NOT NULL
+)ENGINE = InnoDB;
+
+CREATE TABLE schoolUser (
+	schoolUser_UID INT(11) NOT NULL,
+	schoolUser_SID INT(11) NOT NULL,
+	PRIMARY KEY(schoolUser_UID, schoolUser_SID),
+	CONSTRAINT schoolUser_UID_fk
+	FOREIGN KEY(schoolUser_UID) REFERENCES users(users_ID) ON DELETE CASCADE,
+	CONSTRAINT schoolUser_SID_fk
+	FOREIGN KEY(schoolUser_SID) REFERENCES schools(school_ID) ON DELETE CASCADE
+)ENGINE = InnoDB;
+
+CREATE TABLE superAdmins (
+    sAdmin_ID INT(11) NOT NULL,
+    PRIMARY KEY(sAdmin_ID),
+	CONSTRAINT sAdmin_SID_fk
+	FOREIGN KEY(sAdmin_ID) REFERENCES users(users_ID) ON DELETE CASCADE
+)ENGINE = InnoDB;
+
+CREATE TABLE admins (
+    admins_ID INT(11) NOT NULL,
+    PRIMARY KEY(admins_ID),
+	CONSTRAINT admins_AID_fk
+	FOREIGN KEY(admins_ID) REFERENCES users(users_ID) ON DELETE CASCADE
+)ENGINE = InnoDB;
+
+-- RSO names are stored as 'uni: rsoname'
+CREATE TABLE rsos (
+	rso_ID INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	rsoName VARCHAR(50) NOT NULL,
+	rosDesc VARCHAR(255),
+	rso_OID INT(11) NOT NULL,
+	rsoStatus ENUM("active","inactive") DEFAULT "inactive",
+	CONSTRAINT rso_OID_fk
+	FOREIGN KEY(rso_OID) REFERENCES users(users_ID) ON DELETE CASCADE,
+	UNIQUE(rsoName)
+)ENGINE = InnoDB;
+
+CREATE TABLE rsoSchool (
+	rsoSchool_SID INT(11),
+	rsoSchool_RID INT(11) NOT NULL,
+	PRIMARY KEY(rsoSchool_SID,rsoSchool_RID),
+	CONSTRAINT rsoSchool_SID_fk
+	FOREIGN KEY(rsoSchool_SID) REFERENCES schools(school_ID) ON DELETE CASCADE,
+	CONSTRAINT rsoSchool_RID_fk
+	FOREIGN KEY(rsoSchool_RID) REFERENCES rsos(rso_ID) ON DELETE CASCADE
+)ENGINE = InnoDB;
+
+CREATE TABLE rsoUser (
+	rsoUser_ID INT(11) NOT NULL,
+	rsoUser_RID INT(11) NOT NULL,
+	PRIMARY KEY(rsoUser_ID,rsoUser_RID),
+	CONSTRAINT rsoUser_ID_fk
+	FOREIGN KEY(rsoUser_ID) REFERENCES users(users_ID) ON DELETE CASCADE,
+	CONSTRAINT rsoUser_RID_fk
+	FOREIGN KEY(rsoUser_RID) REFERENCES rsos(rso_ID) ON DELETE CASCADE
+)ENGINE = InnoDB;
+
+CREATE TABLE events (
+	event_ID INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
+	event_LID INT(11) NOT NULL,
+	eventName VARCHAR(50) NOT NULL,
+	eventDesc VARCHAR(255) NOT NULL,
+	eventDateTime DATETIME NOT NULL,
+	eventPhone VARCHAR(12) NOT NULL,
+	event_UID INT(11) NOT NULL,
+	event_RID INT(11),
+	CONSTRAINT event_UID_fk
+	FOREIGN KEY(event_UID) REFERENCES schools(school_ID) ON DELETE CASCADE,
+	CONSTRAINT event_LID
+	FOREIGN KEY(event_LID) REFERENCES locations(loc_ID) ON DELETE CASCADE,
+	CONSTRAINT event_RID_fk
+	FOREIGN KEY(event_RID) REFERENCES rsos(rso_ID) ON DELETE CASCADE,
+	UNIQUE(event_LID,eventDateTime)
+)ENGINE = InnoDB;
+
+CREATE TABLE eventUser (
+	eUser_UID INT(11) NOT NULL,
+	eUser_EID INT(11) NOT NULL,
+	PRIMARY KEY(eUser_UID,eUser_EID),
+	CONSTRAINT eUser_UID_fk
+	FOREIGN KEY(eUser_UID) REFERENCES users(users_ID) ON DELETE CASCADE,
+	CONSTRAINT eUser_EID_fk
+	FOREIGN KEY(eUser_EID) REFERENCES events(event_ID) ON DELETE CASCADE
+);
+
+CREATE TABLE privateEvents (
+	pvEvent_ID INT(11) NOT NULL,
+	PRIMARY KEY(pvEvent_ID),
+	CONSTRAINT pvEvent_ID_fk
+	FOREIGN KEY(pvEvent_ID) REFERENCES events(event_ID) ON DELETE CASCADE
+);
+
+CREATE TABLE publicEvents (
+	pbEvent_ID INT(11) NOT NULL,
+	PRIMARY KEY(pbEvent_ID),
+	CONSTRAINT pbEvent_ID_fk
+	FOREIGN KEY(pbEvent_ID) REFERENCES events(event_ID) ON DELETE CASCADE
+);
+
+CREATE TABLE rsoEvents (
+	rsoEvent_ID INT(11) NOT NULL,
+	PRIMARY KEY(rsoEvent_ID),
+	CONSTRAINT rsoEvent_ID_fk
+	FOREIGN KEY(rsoEvent_ID) REFERENCES events(event_ID) ON DELETE CASCADE
+);
+
+-- insertion and deletion done on php end
+CREATE TABLE eventApprove (
+	eApproval_EID INT(11) NOT NULL,
+	eApproval_SID INT(11) NOT NULL,
+	PRIMARY KEY(eApproval_EID,eApproval_SID),
+	CONSTRAINT eApproval_EID_fk
+	FOREIGN KEY(eApproval_EID) REFERENCES events(event_ID) ON DELETE CASCADE,
+	CONSTRAINT eApproval_SID_fk
+	FOREIGN KEY(eApproval_SID) REFERENCES superadmins(sAdmin_ID) ON DELETE CASCADE
+)ENGINE = InnoDB;
+
+CREATE TABLE comments (
+	comment_EID INT(11) NOT NULL,
+	comment_UID INT(11) NOT NULL,
+	cmntTime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+	cmntDesc VARCHAR(255) NOT NULL,
+	PRIMARY KEY(comment_EID, comment_UID, cmntTime),
+	CONSTRAINT comment_EID_fk
+	FOREIGN KEY(comment_EID) REFERENCES events(event_ID) ON DELETE CASCADE,
+	CONSTRAINT comment_UID_fk
+	FOREIGN KEY(comment_UID) REFERENCES users(users_ID) ON DELETE CASCADE
+)ENGINE = InnoDB;
+
+
+DELIMITER $$
+-- trigger setting rso to active if 5 or more people are in the group. adds admin privledges to owner of the rso (regardless of activity)
+CREATE TRIGGER RSOStatusUpdateA AFTER INSERT ON rsoUser
+FOR EACH ROW BEGIN
+IF ((SELECT COUNT(*) FROM rsoUser M WHERE M.rsoUser_RID = NEW.rsoUser_RID) > 4)
+THEN
+	UPDATE rsos SET rsoStatus = "active" WHERE rso_ID = NEW.rsoUser_RID;
+END IF;
+-- Adds admin if another one doesnt already exist for rso that is added into and user isnt already an admin
+IF (((SELECT COUNT(*) FROM rsos R WHERE R.rso_ID = NEW.rsoUser_RID AND R.rso_OID = NEW.rsoUser_ID) > 0)
+AND ((SELECT COUNT(*) FROM admins A WHERE A.admins_ID = NEW.rsoUser_ID) < 1))
+THEN
+	INSERT INTO admins(admins_ID) VALUES(NEW.rsoUser_ID);
+END IF;
+END;$$
+
+-- sets rso to inactive if less than 5 people are in the group, and removes admin if necessary
+-- MOST LIKELY WONT WORK SINCE MYSQL APPARENTLY DOESNT LIKE IT WHEN YOU TRY TO ACTIVATE A TRIGGER ON A CASCADED DELETE
+CREATE TRIGGER RSOStatusUpdateI AFTER DELETE ON rsoUser
+FOR EACH ROW BEGIN
+IF ((SELECT COUNT(*) FROM rsoUser M WHERE M.rsoUser_RID = OLD.rsoUser_RID) < 5)
+THEN
+	UPDATE rsos SET rsoStatus = "inactive" WHERE rso_ID = OLD.rsoUser_RID;
+	IF ((SELECT COUNT(*) FROM rsos N WHERE N.rso_OID = OLD.rsoUser_ID) < 1)
+	THEN
+		DELETE FROM admins A WHERE A.admins_ID = OLD.rsoUser_ID;
+	END IF;
+END IF;
+END;$$
+
+-- adds number of students to university
+CREATE TRIGGER schoolPopCountA AFTER INSERT ON schoolUser
+FOR EACH ROW BEGIN
+UPDATE schools SET schoolPop = schoolPop + 1 WHERE school_ID = NEW.schoolUser_SID;
+END;$$
+
+-- Subtracts number of students from university
+-- MOST LIKELY WONT WORK SINCE MYSQL APPARENTLY DOESNT LIKE IT WHEN YOU TRY TO ACTIVATE A TRIGGER ON A CASCADED DELETE
+CREATE TRIGGER schoolPopCountS AFTER DELETE ON schoolUser
+FOR EACH ROW BEGIN
+UPDATE schools SET schoolPop = schoolPop - 1 WHERE school_ID = OLD.schoolUser_SID;
+END;$$
+
+DELIMITER ;

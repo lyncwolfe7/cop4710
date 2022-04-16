@@ -1,7 +1,6 @@
-<?php
+<<?php
 
-/*** begin our session ***/
-session_start();
+include_once "header.php";
 
 ?>
 
