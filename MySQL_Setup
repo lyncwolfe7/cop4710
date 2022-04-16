@@ -2,7 +2,6 @@ create DATABASE project;
 
 use project;
 
---Location Table
 CREATE TABLE locations (
 	loc_ID INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
 	locLatt VARCHAR(128) NOT NULL,
@@ -10,7 +9,6 @@ CREATE TABLE locations (
 	UNIQUE(locLatt,locLong)
 )ENGINE = InnoDB;
 
---School Table
 CREATE TABLE schools (
 	school_ID INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
 	schoolName VARCHAR(30) NOT NULL,
@@ -19,7 +17,6 @@ CREATE TABLE schools (
 	UNIQUE(schoolName)
 )ENGINE = InnoDB;
 
---School Location Table
 CREATE TABLE schoolLoc (
 	schoolLoc_UID INT(11) NOT NULL,
 	schoolLoc_LID INT(11) NOT NULL,
