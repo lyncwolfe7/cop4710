@@ -168,14 +168,13 @@ CREATE TABLE comments (
 
 
 DELIMITER $$
--- trigger setting rso to active if 5 or more people are in the group. adds admin privledges to owner of the rso (regardless of activity)
+
 CREATE TRIGGER RSOStatusUpdateA AFTER INSERT ON rsoUser
 FOR EACH ROW BEGIN
 IF ((SELECT COUNT(*) FROM rsoUser M WHERE M.rsoUser_RID = NEW.rsoUser_RID) > 4)
 THEN
 	UPDATE rsos SET rsoStatus = "active" WHERE rso_ID = NEW.rsoUser_RID;
 END IF;
--- Adds admin if another one doesnt already exist for rso that is added into and user isnt already an admin
 IF (((SELECT COUNT(*) FROM rsos R WHERE R.rso_ID = NEW.rsoUser_RID AND R.rso_OID = NEW.rsoUser_ID) > 0)
 AND ((SELECT COUNT(*) FROM admins A WHERE A.admins_ID = NEW.rsoUser_ID) < 1))
 THEN
@@ -183,28 +182,14 @@ THEN
 END IF;
 END;$$
 
--- sets rso to inactive if less than 5 people are in the group, and removes admin if necessary
--- MOST LIKELY WONT WORK SINCE MYSQL APPARENTLY DOESNT LIKE IT WHEN YOU TRY TO ACTIVATE A TRIGGER ON A CASCADED DELETE
-CREATE TRIGGER RSOStatusUpdateI AFTER DELETE ON rsoUser
-FOR EACH ROW BEGIN
-IF ((SELECT COUNT(*) FROM rsoUser M WHERE M.rsoUser_RID = OLD.rsoUser_RID) < 5)
-THEN
-	UPDATE rsos SET rsoStatus = "inactive" WHERE rso_ID = OLD.rsoUser_RID;
-	IF ((SELECT COUNT(*) FROM rsos N WHERE N.rso_OID = OLD.rsoUser_ID) < 1)
-	THEN
-		DELETE FROM admins A WHERE A.admins_ID = OLD.rsoUser_ID;
-	END IF;
-END IF;
-END;$$
 
--- adds number of students to university
+
 CREATE TRIGGER schoolPopCountA AFTER INSERT ON schoolUser
 FOR EACH ROW BEGIN
 UPDATE schools SET schoolPop = schoolPop + 1 WHERE school_ID = NEW.schoolUser_SID;
 END;$$
 
--- Subtracts number of students from university
--- MOST LIKELY WONT WORK SINCE MYSQL APPARENTLY DOESNT LIKE IT WHEN YOU TRY TO ACTIVATE A TRIGGER ON A CASCADED DELETE
+
 CREATE TRIGGER schoolPopCountS AFTER DELETE ON schoolUser
 FOR EACH ROW BEGIN
 UPDATE schools SET schoolPop = schoolPop - 1 WHERE school_ID = OLD.schoolUser_SID;
