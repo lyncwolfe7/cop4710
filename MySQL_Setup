@@ -140,7 +140,7 @@ CREATE TABLE rsoEvents (
 	FOREIGN KEY(rsoEvent_ID) REFERENCES events(event_ID) ON DELETE CASCADE
 );
 
--- insertion and deletion done on php end
+
 CREATE TABLE eventApprove (
 	eApproval_EID INT(11) NOT NULL,
 	eApproval_SID INT(11) NOT NULL,
