@@ -1,61 +1,59 @@
 <?php
-
 	include_once "header.php"
-
 ?>
 
-<link rel="stylesheet" href="css/rsostyle.css">
-
+<link rel="stylesheet" href="styles.css">
 <script src="javascript/jquery.min.js"></script>
 <script src="javascript/RSOsAjax.js"></script>
 
-<section class="events">
-	<?php
-		if (isset($_SESSION["users_ID"])) {
-			$useruni = getUsersUniversity($conn, $_SESSION["users_ID"]);
-			$uniname = getUniversityName($conn, $useruni);
-			echo "<h2>All RSOs for " . $uniname . "</h2>";
-		}
-		else {
-				header("location: index.php");
-		}
-	?>
-	<ul class="tilesWrap">
+<div class="box">
+	<p class="heading4">RSOs</p>
+	<section class="events">
 		<?php
 			if (isset($_SESSION["users_ID"])) {
-				$userid = $_SESSION["users_ID"];
-				$useruni = getUsersUniversity($conn, $userid);
-				$rsodata = getUniversityRSOs($conn, $useruni);
-				while($row = mysqli_fetch_assoc($rsodata)) {
-					echo "<li>";
-					$rsoid = $row["rsouniversityRid"];
-					$rsoinfo = getRSOInfo($conn, $rsoid);
-					$rsoname = $rsoinfo["rsosName"];
-					$rsodesc = $rsoinfo["rsosDesc"];
-					$rsouniid = getRSOUniversity($conn, $rsoid);
-					$uniname = getUniversityName($conn, $rsouniid);
-					echo "<h2>" . $uniname . "</h2>";
-					echo "<h4><b>" . $rsoname . "</b></h4>";
-					echo "<p>" . $rsodesc . "</p>";
-					
-					if (isUserInRSO($conn, $rsoid, $userid) === TRUE) {
-						echo "<button type='button'>RSO Already Joined</button>";
-					}
-					else {
-						echo "<button type='button' onclick='attemptJoinRSO(" . $rsoid . ")'>Join RSO</button>";
-					}
-					echo "</li>";
-				}
+				$userSchool = getUsersSchool($conn, $_SESSION["users_ID"]);
+				$schoolName = getSchoolName($conn, $schoolName);
+				echo "<h2>All RSOs for " . $schoolName . "</h2>";
 			}
 			else {
-				header("location: index.php");
+					header("location: index.php");
 			}
 		?>
-	</ul>
-</section>
+		<ul class="tilesWrap">
+			<?php
+				if (isset($_SESSION["user_ID"])) {
+					$userID = $_SESSION["user_ID"];
+					$userSchool = getUsersSchool($conn, $userID);
+					$rsoData = getSchoolRSOs($conn, $userSchool);
+					while($row = mysqli_fetch_assoc($rsoData)) {
+						echo "<li>";
+						$rsoID = $row["rsoSchool_RID"];
+						$rsoInfo = getRSOInfo($conn, $rsoid);
+						$rsoName = $rsoInfo["rsosName"];
+						$rsoDesc = $rsoInfo["rsosDesc"];
+						$rsoSID = getRSOSchool($conn, $rsoID);
+						$schoolName = getUniversityName($conn, $rsoSID);
+						echo "<h2>" . $schoolName . "</h2>";
+						echo "<h4><b>" . $rsoName . "</b></h4>";
+						echo "<p>" . $rsoDesc . "</p>";
+						
+						if (userInRSO($conn, $rsoID, $userID) === TRUE) {
+							echo "<button type='button'>RSO Already Joined</button>";
+						}
+						else {
+							echo "<button type='button' onclick='joinRSO(" . $rsoID . ")'>Join RSO</button>";
+						}
+						echo "</li>";
+					}
+				}
+				else {
+					header("location: index.php");
+				}
+			?>
+		</ul>
+	</section>
+</div>
 
 <?php
-
 	include_once "footer.php";
-
 ?>

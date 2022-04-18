@@ -49,7 +49,14 @@
     } catch(er) {console.log(er);}
     /*[ Select 2 Config ]
         ===========================================================*/
-    
+        $('.js-select-simple').select2({
+            width: 'resolve' // need to override the changed default
+        });
+
+        $('.js-select-simple').select2({
+            outerHeight: 'resolve' // need to override the changed default
+        });
+
     try {
         var selectSimple = $('.js-select-simple');
     

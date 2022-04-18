@@ -2,46 +2,78 @@
     include_once 'header.php';
 ?>
 
-<?php
-    // Error handling
-    if(isset($_GET["error"])) {
-        if ($_GET["error"] == "empty_input") {
-            echo "<p style='color:#500'>You must fill in all fields.<br><br></p>";
+<div class="box">
+    <?php
+        $message = null;
+        if(isset($_GET["error"])) {
+            if ($_GET["error"] == "empty_input") {
+                $message =  "<p style='color:red'>You must fill in all fields.<br><br></p>";
+            }
+            if ($_GET["error"] == "invalid_username") {
+                $message =  "<p style='color:red'>Invalid username Please try again.<br><br></p>";
+            }
+            if ($_GET["error"] == "invalid_email") {
+                $message =  "<p style='color:red'>Invalid Email. Please try again.<br><br></p>";
+            }  
+            if ($_GET["error"] == "password_mismatch") {
+                $message =  "<p style='color:red'>Passwords do not match.<br><br></p>";
+            }
+            if ($_GET["error"] == "nonunique_username") {
+                $message =  "<p style='color:red'>Username already exists.<br><br></p>";
+            }
+            if ($_GET["error"] == "email_exists") {
+                $message =  "<p style='color:red'>Email already exists.<br><br></p>";
+            }
+            if ($_GET["error"] == "bad_stmt") {
+                $message =  "<p style='color:red'>Database error. Please try again.<br><br></p>";
+            }        
+            if ($_GET["error"] == "none") {
+                $message =  "<p style='color:blue'>Sign up successful.<br><br></p>";
+            }
         }
-        if ($_GET["error"] == "password_mismatch") {
-            echo "<p style='color:#500'>Passwords do not match.<br><br></p>";
-        }
-        if ($_GET["error"] == "nonunique_email") {
-            echo "<p style='color:#500'>Email already exists.<br><br></p>";
-        }
-        if ($_GET["error"] == "nonunique_username") {
-            echo "<p style='color:#500'>Username already exists.<br><br></p>";
-        }
-        if ($_GET["error"] == "bad_stmt") {
-            echo "<p style='color:#500'>Database error. Please try again.<br><br></p>";
-        }
-        
-        if ($_GET["error"] == "none") {
-            echo "<p style='color:#500'>Sign up successful.<br><br></p>";
-        }
-    }
-?>
+    ?>
 
+    <form class="form5" action="include/superAdmin-signup.php" method="post">
+        <div>
+            <p class="heading2">Sign Up</p>
+            <div class="error5">
+                <?php
 
-<center><section class='signup-form'>
-    <h2>Sign Up</h2>
-    <form action='signup_include.php' method='post'>
-        <input type='text' name='name' placeholder='Full name...'> <br><br>
-        <input type='text' name='email' placeholder='Email...'> <br><br>
-        <input type='text' name='username' placeholder='Username...'> <br><br>
-        <input type='password' name='password' placeholder='Password...'> <br><br>
-        <input type='password' name='passwordConfirm' placeholder='Confirm Password...'> <br><br>
-        <input type='text' name='university' placeholder='University...'> <br><br>
-        <button type='submit' name='submit'>Sign Up</button> <br><br>
+                    if (!is_null($message)) {
+                        echo $message;
+                    }
+                ?>
+            </div>
+            
+            <label>
+            <span class="label5">Full Name</span><input class="input5" type="text" name="name">
+            </label>
+
+            <label>
+            <span class="label5">Email</span><input class="input5" type="text" name="email">
+            </label>
+
+            <label>
+            <span class="label5">Username</span><input class="input5" type="text" name="username">
+            </label>
+
+            <label>
+            <span class="label5">Password</span><input class="input5" type="password" name="password">
+            </label>
+            
+            <label>
+            <span class="label5">Confirm Password</span><input class="input5" type="password" name="passwordConfirm">
+            </label>
+
+            <label>
+            <span class="label5">School Name</span><input class="input5" type="text" name="schoolName">
+            </label>
+
+            <button class="button5" type="submit" name="submit">Sign Up</button>
+        </div>
     </form>
-</section></center>
 
-
+</div>
 
 <?php
     include_once 'footer.php';

@@ -3,16 +3,16 @@ function alertThenReload(msg) {
 	window.location.reload(false);
 }
 
-function attemptLeaveEventAjax(eid)
+function JoinEventAjax(EID)
 {
 	ajax = $.ajax({
-			url: 'includes/my_events-includes.php',
+			url: 'include/events-include.php',
 			type: 'POST',
-			data: {method: "leaveEventHelper", eid: eid},
+			data: {method: "joinEventHelp", EID: EID},
 			dataType: 'json',
 			success: function(data){
 				if (data.status === 'ok') {
-					alertThenReload("Successfully left event.");
+					alertThenReload("Successfully joined event.");
 				}
 				else {
 					var errorMessage = data.statusText;
@@ -22,9 +22,8 @@ function attemptLeaveEventAjax(eid)
 		});
 	return;
 }
-
-function attemptLeaveEvent(eventid)
+function attemptJoinEvent(eventid)
 {
 	eid = JSON.stringify(eventid);
-	attemptLeaveEventAjax(eid);
+	attemptJoinEventAjax(eid);
 }

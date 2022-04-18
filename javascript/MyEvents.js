@@ -3,16 +3,16 @@ function alertThenReload(msg) {
 	window.location.reload(false);
 }
 
-function attemptJoinRSOAjax(rid)
+function leaveEventAjax(EID)
 {
 	ajax = $.ajax({
-			url: 'includes/rsos-includes.php',
+			url: 'include/myEvents-include.php',
 			type: 'POST',
-			data: {method: "joinRSOHelper", rid: rid},
+			data: {method: "leaveEventHelp", EID: EID},
 			dataType: 'json',
 			success: function(data){
 				if (data.status === 'ok') {
-					alertThenReload("Successfully joined RSO.");
+					alertThenReload("Successfully left event.");
 				}
 				else {
 					var errorMessage = data.statusText;
@@ -22,8 +22,9 @@ function attemptJoinRSOAjax(rid)
 		});
 	return;
 }
-function attemptJoinRSO(rsoid)
+
+function leaveEvent(event_ID)
 {
-	rid = JSON.stringify(rsoid);
-	attemptJoinRSOAjax(rid);
+	EID = JSON.stringify(event_ID);
+	leaveEventAjax(EID);
 }

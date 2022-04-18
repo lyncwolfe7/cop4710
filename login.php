@@ -2,26 +2,43 @@
     include_once 'header.php';
 ?>
 
-<?php
-    if(isset($_GET["error"])) {
-        if ($_GET["error"] == "empty_input") {
-            echo "<p style='color:#500'>You must fill in all fields.<br><br></p>";
+<div class="box">
+    <?php
+        $message = null;
+        if(isset($_GET["error"])) {
+            if ($_GET["error"] == "empty_input") {
+                $message = "<p style='color:red'>You must fill in all fields.<br><br></p>";
+            }
+            if ($_GET["error"] == "incorrect_login") {
+                $message =  "<p style='color:red'>Username or password is incorrect.<br><br></p>";
+            }
         }
-        if ($_GET["error"] == "incorrect_login") {
-            echo "<p style='color:#500'>Username or password is incorrect.<br><br></p>";
-        }
-    }
-?>
+    ?>
 
-<center><section class='login-form'>
-    <h2>Login</h2>
-    <form action='login_include.php' method='post'>
-        <input type='text' name='username' placeholder='Username...'> <br><br>
-        <input type='password' name='password' placeholder='Password...'> <br><br>
-        <button type='submit' name='submit'>Login</button> <br><br>
+    <form class="form5" action="login_include.php" method="post">
+        <div>
+            <p class="heading2">Log In</p>
+            <div class="error5">
+                <?php
+                    if (!is_null($message)) {
+                    echo $message;
+                    }
+                ?>
+            </div>
+            <label>
+                <span class="label5">Username</span>
+                <input class="input5" type="text" name="username">
+            </label>
+
+            <label>
+                <span class="label5">Password</span>
+                <input class="input5" type="password" name="password">
+            </label>
+
+            <button class="button5" type="submit" name="submit">Log In</button>
+        </div>
     </form>
-</section></center>
-
+</div>
 
 
 <?php

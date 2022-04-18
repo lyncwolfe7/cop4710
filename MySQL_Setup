@@ -59,11 +59,10 @@ CREATE TABLE admins (
 	FOREIGN KEY(admins_ID) REFERENCES users(users_ID) ON DELETE CASCADE
 )ENGINE = InnoDB;
 
--- RSO names are stored as 'uni: rsoname'
 CREATE TABLE rsos (
 	rso_ID INT(11) PRIMARY KEY AUTO_INCREMENT NOT NULL,
 	rsoName VARCHAR(50) NOT NULL,
-	rosDesc VARCHAR(255),
+	rsoDesc VARCHAR(255),
 	rso_OID INT(11) NOT NULL,
 	rsoStatus ENUM("active","inactive") DEFAULT "inactive",
 	CONSTRAINT rso_OID_fk
@@ -72,11 +71,11 @@ CREATE TABLE rsos (
 )ENGINE = InnoDB;
 
 CREATE TABLE rsoSchool (
-	rsoSchool_SID INT(11),
+	rsoSchool_UID INT(11),
 	rsoSchool_RID INT(11) NOT NULL,
-	PRIMARY KEY(rsoSchool_SID,rsoSchool_RID),
-	CONSTRAINT rsoSchool_SID_fk
-	FOREIGN KEY(rsoSchool_SID) REFERENCES schools(school_ID) ON DELETE CASCADE,
+	PRIMARY KEY(rsoSchool_UID,rsoSchool_RID),
+	CONSTRAINT rsoSchool_UID_fk
+	FOREIGN KEY(rsoSchool_UID) REFERENCES schools(school_ID) ON DELETE CASCADE,
 	CONSTRAINT rsoSchool_RID_fk
 	FOREIGN KEY(rsoSchool_RID) REFERENCES rsos(rso_ID) ON DELETE CASCADE
 )ENGINE = InnoDB;
@@ -140,7 +139,7 @@ CREATE TABLE rsoEvents (
 	FOREIGN KEY(rsoEvent_ID) REFERENCES events(event_ID) ON DELETE CASCADE
 );
 
-
+-- insertion and deletion done on php end
 CREATE TABLE eventApprove (
 	eApproval_EID INT(11) NOT NULL,
 	eApproval_SID INT(11) NOT NULL,
@@ -172,6 +171,7 @@ IF ((SELECT COUNT(*) FROM rsoUser M WHERE M.rsoUser_RID = NEW.rsoUser_RID) > 4)
 THEN
 	UPDATE rsos SET rsoStatus = "active" WHERE rso_ID = NEW.rsoUser_RID;
 END IF;
+
 IF (((SELECT COUNT(*) FROM rsos R WHERE R.rso_ID = NEW.rsoUser_RID AND R.rso_OID = NEW.rsoUser_ID) > 0)
 AND ((SELECT COUNT(*) FROM admins A WHERE A.admins_ID = NEW.rsoUser_ID) < 1))
 THEN
@@ -179,13 +179,22 @@ THEN
 END IF;
 END;$$
 
-
+CREATE TRIGGER RSOStatusUpdateI AFTER DELETE ON rsoUser
+FOR EACH ROW BEGIN
+IF ((SELECT COUNT(*) FROM rsoUser M WHERE M.rsoUser_RID = OLD.rsoUser_RID) < 5)
+THEN
+	UPDATE rsos SET rsoStatus = "inactive" WHERE rso_ID = OLD.rsoUser_RID;
+	IF ((SELECT COUNT(*) FROM rsos N WHERE N.rso_OID = OLD.rsoUser_ID) < 1)
+	THEN
+		DELETE FROM admins A WHERE A.admins_ID = OLD.rsoUser_ID;
+	END IF;
+END IF;
+END;$$
 
 CREATE TRIGGER schoolPopCountA AFTER INSERT ON schoolUser
 FOR EACH ROW BEGIN
 UPDATE schools SET schoolPop = schoolPop + 1 WHERE school_ID = NEW.schoolUser_SID;
 END;$$
-
 
 CREATE TRIGGER schoolPopCountS AFTER DELETE ON schoolUser
 FOR EACH ROW BEGIN
