@@ -4,7 +4,7 @@
 
 <link rel="stylesheet" href="styles.css">
 <script src="javascript/jquery.min.js"></script>
-<script src="javascript/RSOsAjax.js"></script>
+<script src="javascript/RSOs.js"></script>
 
 <div class="box">
 	<p class="heading4">RSOs</p>

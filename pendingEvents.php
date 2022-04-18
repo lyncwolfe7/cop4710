@@ -4,7 +4,7 @@
 
 <link rel="stylesheet" href="styles.css">
 <script src="javascript/jquery.min.js"></script>
-<script src="javascript/PendingEventsAjax.js"></script>
+<script src="javascript/PendingEvents.js"></script>
 
 <div class="box">
 	<p class="heading4">All Pending Events for Your School</p>

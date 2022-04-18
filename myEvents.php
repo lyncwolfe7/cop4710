@@ -4,7 +4,7 @@
 
 <link rel="stylesheet" href="styles.css">
 <script src="javascript/jquery.min.js"></script>
-<script src="javascript/MyEventsAjax.js"></script>
+<script src="javascript/MyEvents.js"></script>
 
 <style>
 	.modal {
